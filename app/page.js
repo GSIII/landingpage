@@ -1,103 +1,158 @@
+"use client";
+
+import { useState } from "react";
 import Image from "next/image";
+import { supabase } from "@/lib/supabaseClient";
+import { programmeImageUrl } from "@/lib/storage";
+import Memo from "@/components/Memo";
+import ResultModal from "@/components/ResultModal";
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.js
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [searchTerm, setSearchTerm] = useState("");
+  const [results, setResults] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  const handleSearch = async (e) => {
+    e.preventDefault();
+    if (!searchTerm.trim()) return;
+    setIsLoading(true);
+    setIsModalOpen(true);
+    setResults([]);
+    try {
+      const { data, error } = await supabase
+        .from("memo")
+        .select("*")
+        .or(
+          `play_title.ilike.%${searchTerm}%, play_author.ilike.%${searchTerm}%`
+        );
+
+      if (error) throw error;
+      setResults(data || []);
+    } catch (error) {
+      console.error("Search error:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div>
+      {/* Navigation Bar */}
+      <nav className="fixed top-0 left-0 right-0 bg-white border-b z-50">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <Image src="/logo.svg" alt="로고" width={160} height={35} />
+            </div>
+            <div className="flex items-center space-x-8 text-black">
+              <a href="#hero">Home</a>
+              <a href="#search">Search</a>
+              <a href="#memo">Memo</a>
+              <a href="#programme">Programme</a>
+              <button>Get Started</button>
+            </div>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
+      </nav>
+
+      {/* Hero Section */}
+      <section id="hero" className="h-screen relative">
+        <Image
+          src={"/herosection.png"}
+          alt="메인 이미지"
+          fill
+          style={{ objectFit: "cover" }}
+          priority={true}
+        />
+      </section>
+
+      {/* Search section */}
+      <section id="search" className="h-screen flex flex-col bg-secondary">
+        <div className="w-full bg-[#911A00] text-[#DA8248] text-3xl flex items-center justify-center h-[76px]">
+          A home for words and scripts. Spoken & Written, Together
+        </div>
+
+        <div className="flex-1 flex items-center justify-center px-6">
+          <div className="flex flex-col items-center w-full">
+            <Image src={"/book.svg"} alt="책" width={112} height={112} />
+
+            <h2 className="text-3xl text-primary my-8">
+              오늘 찾아볼 희곡은 무엇인가요?
+            </h2>
+
+            <form
+              onSubmit={handleSearch}
+              className="w-full max-w-xl p-5 border-b-2 border-primary flex justify-between items-center"
+            >
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="희곡 제목 또는 작가명으로 검색하세요"
+                className="w-full bg-transparent text-[#B28B7A] placeholder:text-[#B28B7A] focus:outline-none"
+              />
+              <button type="submit" className="cursor-pointer">
+                <Image
+                  src={"/search.svg"}
+                  alt="검색 아이콘"
+                  width={24}
+                  height={24}
+                />
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      {/* Memo Section */}
+      <section id="memo" className="min-h-screen bg-secondary relative">
+        <div className="bg-primary text-secondary relative z-10 pb-32">
+          <div className="mx-auto px-[120px] flex justify-between items-center h-[304px]">
+            <div>
+              <h2 className="text-3xl font-bold mb-2">지금 뜨는 메모</h2>
+              <p className="text-gray-200">
+                다른 유저가 남기고 간 메모를 발견해보세요
+              </p>
+            </div>
+            <div className="text-6xl">Memo</div>
+          </div>
+        </div>
+        <div className="relative z-20 mt-[-50px]">
+          <Memo />
+        </div>
+      </section>
+
+      {/* Programme Section */}
+      <section id="programme" className="min-h-screen bg-secondary relative">
+        <div className="bg-gradient-to-r from-white to-[#F8F1EA] relative z-10">
+          <div className="mx-auto px-[120px] flex justify-between items-center h-[304px]">
+            <div>
+              <h2 className="text-primary text-3xl font-bold mb-2">
+                지금 신청할 수 있는 프로그램
+              </h2>
+              <p className="text-[#2A2A2A]">인스크립트 프로그램에 참여하세요</p>
+            </div>
+            <div className="text-[#F4E4D6] text-6xl">Programme</div>
+          </div>
+        </div>
+        <div className="relative z-20 mt-[-80px] overflow-hidden flex justify-center mb-[30px]">
           <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+            src={programmeImageUrl}
+            alt="이달의 프로그램"
+            width={1207}
+            height={300}
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+        </div>
+      </section>
+
+      {isModalOpen && (
+        <ResultModal
+          isLoading={isLoading}
+          results={results}
+          onClose={() => setIsModalOpen(false)}
+        />
+      )}
     </div>
   );
 }
