@@ -89,7 +89,7 @@ export default function Home() {
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="희곡 제목 또는 작가명으로 검색하세요"
+                placeholder="희곡 제목 또는 작가명으로 검색하세요(예 : 아서 밀러, 갈라테아)"
                 className="w-full bg-transparent text-[#B28B7A] placeholder:text-[#B28B7A] focus:outline-none"
               />
               <button type="submit" className="cursor-pointer">
