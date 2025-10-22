@@ -33,6 +33,7 @@ export default function Home() {
       console.error("Search error:", error);
     } finally {
       setIsLoading(false);
+      setSearchTerm("");
     }
   };
 
