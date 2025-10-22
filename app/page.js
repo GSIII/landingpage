@@ -37,20 +37,36 @@ export default function Home() {
   };
 
   return (
-    <div>
-      {/* Navigation Bar */}
+    <main>
       <nav className="fixed top-0 left-0 right-0 bg-white border-b z-50">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
               <Image src="/logo.svg" alt="로고" width={160} height={35} />
             </div>
-            <div className="flex items-center space-x-8 text-black">
-              <a href="#hero">Home</a>
-              <a href="#search">Search</a>
-              <a href="#memo">Memo</a>
-              <a href="#programme">Programme</a>
-              <button>Get Started</button>
+            <div className="hidden md:flex items-center space-x-6 text-sm text-gray-700">
+              <a href="#">희곡 DB</a>
+              <a href="#">작가 DB</a>
+              <a href="#">멤버십</a>
+              <a href="#" className="flex items-center">
+                프로그램
+              </a>
+              <a href="#" className="flex items-center">
+                커뮤니티
+              </a>
+              <a href="#">인스크립트</a>
+              <a href="#">문의</a>
+            </div>
+            <div className="flex items-center space-x-4 text-gray-500 text-xl">
+              <a href="#" aria-label="링크">
+                🔗
+              </a>
+              <a href="#" aria-label="메일">
+                ✉️
+              </a>
+              <a href="#" aria-label="유저">
+                👤
+              </a>
             </div>
           </div>
         </div>
@@ -69,7 +85,7 @@ export default function Home() {
 
       {/* Search section */}
       <section id="search" className="h-screen flex flex-col bg-secondary">
-        <div className="w-full bg-[#911A00] text-[#DA8248] text-3xl flex items-center justify-center h-[76px]">
+        <div className="w-full bg-primary text-[#DA8248] text-3xl flex items-center justify-center h-[76px]">
           A home for words and scripts. Spoken & Written, Together
         </div>
 
@@ -107,7 +123,7 @@ export default function Home() {
 
       {/* Memo Section */}
       <section id="memo" className="min-h-screen bg-secondary relative">
-        <div className="bg-primary text-secondary relative z-10 pb-32">
+        <div className="bg-primary text-secondary relative z-10">
           <div className="mx-auto px-[120px] flex justify-between items-center h-[304px]">
             <div>
               <h2 className="text-3xl font-bold mb-2">지금 뜨는 메모</h2>
@@ -115,7 +131,7 @@ export default function Home() {
                 다른 유저가 남기고 간 메모를 발견해보세요
               </p>
             </div>
-            <div className="text-6xl">Memo</div>
+            <div className="text-6xl text-orange-700">Memo</div>
           </div>
         </div>
         <div className="relative z-20 mt-[-50px]">
@@ -153,6 +169,6 @@ export default function Home() {
           onClose={() => setIsModalOpen(false)}
         />
       )}
-    </div>
+    </main>
   );
 }
